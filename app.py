@@ -34,7 +34,7 @@ def main():
         min_rev = st.slider("売上成長率 以上 (%)", -20.0, 100.0, 0.0, 0.5)
         min_op = st.slider("営業利益成長率 以上 (%)", -20.0, 100.0, 0.0, 0.5)
         max_per = st.slider("PER 以下", 0.0, 60.0, 60.0, 1.0)
-        max_pbr = st.slider("PBR 以下", 0.0, 10.0, 10.0, 0.1)
+        max_pbr = st.slider("PBR 以下", 0.0, 30.0, 10.0, 0.1)
 
         st.divider()
         sort_key = st.selectbox(
@@ -50,9 +50,10 @@ def main():
         use_asc = sort_key in ("per", "pbr")
 
     # フィルタリング
+    # 成長率が取得できない銘柄（銀行等）は、成長フィルタで落とさず表示する
     mask = (
-        (df["revenue_growth"] >= min_rev)
-        & (df["operating_profit_growth"] >= min_op)
+        (df["revenue_growth"].isna() | (df["revenue_growth"] >= min_rev))
+        & (df["operating_profit_growth"].isna() | (df["operating_profit_growth"] >= min_op))
         & (df["per"].isna() | (df["per"] <= max_per))
         & (df["pbr"].isna() | (df["pbr"] <= max_pbr))
     )
